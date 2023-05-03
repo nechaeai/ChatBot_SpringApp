@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import java.util.List;
+import java.util.Arrays;
 
 // Marks the class as a Spring service
 @Service
@@ -41,8 +42,8 @@ public class ChatGPTService {
 
         // Create a ChatGPTRequest object and set its properties
         ChatGPTRequest chatGPTRequest = new ChatGPTRequest();
-        chatGPTRequest.setModel("gpt-3.5-turbo");
-        chatGPTRequest.setMessages(List.of(new Message("user", prompt)));
+        chatGPTRequest.setModel("gpt-4");
+        chatGPTRequest.setMessages(Arrays.asList(new Message("user", prompt)));
 
         // Create a RestTemplate object
         RestTemplate restTemplate = new RestTemplate();

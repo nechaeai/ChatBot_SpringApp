@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Form</title>
+    
+    <style>
+        /* Style for the chat icon */
+	  .chat-icon {
+          position: fixed;
+          bottom: 30px;
+          right: 30px;
+          font-size: 30px;
+          cursor: pointer;
+          background-color: #4CAF50;
+          border-radius: 50%;
+          width: 60px;
+          height: 60px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		  transition: transform 0.3s ease;
+        }
+        
+	/* Class for rotating the chat icon */
+	   .chat-icon.rotated {
+           transform: rotate(45deg);
+	     }
+
+        body {
+          font-family: "Segoe UI", sans-serif;
+          background-color: #f1f1f1;
+          margin: 0;
+          padding: 0;
+        }
+
+        /* Style for the form container */
+         form {
+          background-color: white;
+          border-radius: 5px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          padding: 30px;
+          max-width: 500px;
+          margin: 50px auto;
+        }
+
+        /* Style for the form label */
+ 		 label {
+          font-size: 24px;
+          margin-bottom: 10px;
+          display: block;
+        }
+
+        /* Style for the input field */
+        input[type=text] {
+          width: 100%;
+          padding: 12px 20px;
+          margin: 8px 0;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          box-sizing: border-box;
+        }
+
+        button[type=submit] {
+          background-color: #4CAF50;
+          color: white;
+          padding: 12px 20px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          width: 100%;
+          font-size: 18px;
+        }
+
+        /* Style for the button on hover */
+        button[type=submit]:hover {
+          background-color: #45a049;
+        }
+
+        /* Style for the user input and AI response container */
+        div {
+          margin-top: 50px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+
+        /* Style for the user input and AI response text */
+        p {
+          font-size: 18px;
+          margin: 10px 0;
+        }
+
+        /* Style for the span containing the user input and AI response text */
+        span {
+          font-weight: bold;
+          color: #4CAF50;
+        }
+
+        /* Style for the form container with slide-down effect */
+   		#chat-form {
+          margin-top: 50px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          max-height: 0;
+          overflow: hidden;
+          transition: max-height 0.3s ease-out;
+          opacity: 0;
+          transition: opacity 0.3s ease-out;
+        }
+
+        /* Expanded form container */
+         #chat-form.expanded {
+          max-height: 500px;
+          opacity: 1;
+        }
+         #chat-form label {
+          opacity: 0;
+          transition: opacity 0.3s ease-out;
+        }
+
+        /* Style for the form label when visible */
+        #chat-form.expanded label {
+          opacity: 1;
+        }
+             .response-container.hidden {
+          display: none;
+        }
+           #response-container {
+          max-height: 0;
+          overflow: hidden;
+          transition: max-height 0.3s ease-out;
+        }
+
+        /* Expanded response container */
+        #response-container.expanded {
+              display: block;
+          
+        }
+	        /* Style for the clear button */
+		#clear-response {
+		  background-color: #f44336;
+		  color: white;
+		  padding: 12px 20px;
+		  border: none;
+		  border-radius: 4px;
+		  cursor: pointer;
+		  font-size: 18px;
+		  margin-top: 10px;
+		  display: none; /* Initially hide the button */
+		}
+	
+	/* Style for the clear button on hover */
+		#clear-response:hover {
+		  background-color: #da190b;
+		}
+	
+		/* Container for the response and clear button */
+		.response-wrapper {
+		  display: flex;
+		  flex-direction: column;
+		  align-items: center;
+		}
+		/* Center the response container */
+		.response-container {
+		    width: 60%;
+		    margin: 0 auto;
+		}
+		
+		/* Wrap text within the response container */
+		.response-container p {
+		    word-wrap: break-word;
+		}
+	        
+    </style>
+</head>
+<body>
+
+<!-- Chat icon -->
+<div class="chat-icon" id="chat-icon">&#128172;</div>
+
+<!-- Add an id attribute to the form element -->
+
+<form method="post" id="chat-form">
+    <label for="input">Ask a question:</label>
+    <input type="text" id="input" name="message">
+    <button type="submit">Submit</button>
+</form>
+
+<div class="response-wrapper"> <!-- Add this line -->
+    <div id="response-container" class="response-container">
+        <p>User input: <span th:text="${input}"></span></p>
+        <p>AI response: <span th:block th:text="${response}"></span></p>
+    </div>
+    <button id="clear-response" type="button">Clear</button>
+</div>
+<script>
+
+ // Add an event listener for the "Clear" button
+document.getElementById("clear-response").addEventListener("click", function() {
+    var responseContainer = document.getElementById("response-container");
+    responseContainer.innerHTML = "";
+    this.style.display = "none"; // Hide the "Clear" button
+});
+
+// Show the "Clear" button after receiving a response
+function showClearButton() {
+    var clearButton = document.getElementById("clear-response");
+    clearButton.style.display = "block";
+}
+
+  document.getElementById("chat-icon").addEventListener("click", function () {
+    var chatIcon = document.getElementById("chat-icon");
+    var chatForm = document.getElementById("chat-form");
+    var responseContainer = document.getElementById("response-container");
+
+    // Toggle the 'rotated' class on the chat icon
+    chatIcon.classList.toggle("rotated");
+
+    if (chatForm.classList.contains("expanded")) {
+        chatForm.classList.remove("expanded");
+        if (responseContainer) {
+            responseContainer.classList.remove("expanded");
+        }
+    } else {
+        chatForm.classList.add("expanded");
+        if (responseContainer) {
+            responseContainer.classList.add("expanded");
+        }
+    }
+});
+
+document.getElementById("chat-form").addEventListener("submit", async function (event) {
+    event.preventDefault();
+    var userInput = document.getElementById("input").value;
+    var responseContainer = document.getElementById("response-container");
+    var userText = document.createElement("p");
+    var responseText = document.createElement("p");
+
+    userText.innerHTML = "User input: <span>" + userInput + "</span>";
+    responseContainer.innerHTML = "";
+    responseContainer.appendChild(userText);
+
+    try {
+        // Fetch the AI response from the server
+        const response = await fetch("/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({ message: userInput }),
+        });
+
+      if (response.ok) {
+    const jsonResponse = await response.json();
+    responseText.innerHTML = "AI response: <span>" + jsonResponse.response + "</span>";
+    responseContainer.appendChild(responseText);
+    showClearButton(); // Add this line
+} else {
+    responseText.innerHTML = "Error: Could not fetch AI response.";
+    responseContainer.appendChild(responseText);
+    showClearButton(); // Add this line
+}
+    } catch (error) {
+        responseText.innerHTML = "Error: Could not fetch AI response.";
+        responseContainer.appendChild(responseText);
+        console.error('Error details:', error); // Add this line
+    }
+
+    responseContainer.classList.add("expanded");
+    responseContainer.style.maxHeight = "500px";
+});
+
+</script>
+
+
+</body>
+</html>
